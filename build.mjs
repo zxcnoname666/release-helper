@@ -12,7 +12,7 @@ const sharedConfig = {
   bundle: true,
   platform: 'node',
   target: 'node20',
-  format: 'esm',
+  format: 'cjs',
   banner: {
     js: `// ${pkg.name} v${pkg.version}\n// Built: ${new Date().toISOString()}\n`,
   },
