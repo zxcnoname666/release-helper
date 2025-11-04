@@ -222,5 +222,5 @@ export async function generateChangelog(
   // Fallback to simple format
   info('Generating simple changelog...');
   const { formatSimpleChangelog } = await import('./prompts.js');
-  return formatSimpleChangelog(context.commits, context.stats, context.versionInfo, context.repository);
+  return formatSimpleChangelog(context.commits, context.stats, context.versionInfo, context.repository, context.language);
 }

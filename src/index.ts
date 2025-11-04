@@ -32,6 +32,7 @@ async function run(): Promise<void> {
       allowedBranch: getInput('ALLOWED_BRANCH') || 'main',
       draftRelease: getInput('DRAFT_RELEASE') === 'true',
       prerelease: getInput('PRERELEASE') === 'true',
+      language: getInput('LANGUAGE') || 'en',
     };
 
     const octokit = getOctokit(config.githubToken);
@@ -135,6 +136,7 @@ async function run(): Promise<void> {
       commits: parsedCommits,
       stats,
       repository: { owner, repo },
+      language: config.language,
     };
 
     const aiConfig = config.openaiApiKey

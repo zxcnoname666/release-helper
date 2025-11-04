@@ -19,6 +19,7 @@ export interface ActionConfig {
   allowedBranch: string;
   draftRelease: boolean;
   prerelease: boolean;
+  language: string;
 }
 
 /**
@@ -117,4 +118,5 @@ export interface AIContext {
     owner: string;
     repo: string;
   };
+  language: string;
 }

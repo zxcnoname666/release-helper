@@ -43,6 +43,10 @@ inputs:
   DISCORD_WEBHOOK:
     description: "URL Discord webhook для уведомлений"
     required: false
+  LANGUAGE:
+    description: "Язык для генерации changelog (en, ru, и т.д.)"
+    required: false
+    default: "en"
 
 runs:
   using: "node20"

@@ -54,7 +54,7 @@ Important: If you need more information about specific commits, use the tools pr
  * Generate user prompt with context
  */
 export function generateUserPrompt(context: AIContext): string {
-  const { versionInfo, commits, stats, repository } = context;
+  const { versionInfo, commits, stats, repository, language } = context;
 
   // Group commits
   const grouped = groupCommitsByType(commits);
@@ -133,6 +133,23 @@ Example first response:
 - Use markdown formatting
 
 The changelog should be detailed, informative, and ready to publish as a GitHub release.
+
+${language !== 'en' ? `
+## IMPORTANT: Translation Required
+
+After generating the complete changelog in English, translate the ENTIRE changelog to **${language}** language while:
+1. **Preserving ALL markdown formatting** (headers, lists, links, code blocks, etc.)
+2. **Keeping ALL technical details intact** (commit hashes, usernames, file names, code snippets)
+3. **Maintaining the exact commit format**: "subject [hash] by @author" (translate only the subject part)
+4. **Translating descriptive text and explanations naturally**
+5. **Keeping emojis and special characters as-is**
+
+Example translation for Russian (ru):
+- English: "Add new authentication feature [a1b2c3d] by @john"
+- Russian: "Добавить новую функцию аутентификации [a1b2c3d] by @john"
+
+Translate everything except: commit hashes, GitHub usernames (keep @username), URLs, code blocks, and technical identifiers.
+` : ''}
 `.trim();
 }
 
@@ -167,12 +184,21 @@ export function formatSimpleChangelog(
   commits: ParsedCommit[],
   stats: ReleaseStats,
   versionInfo: { previous?: string; current: string },
-  repository: { owner: string; repo: string }
+  repository: { owner: string; repo: string },
+  language: string = 'en'
 ): string {
   const grouped = groupCommitsByType(commits);
   const types = sortCommitTypes(Array.from(grouped.keys()));
 
-  let changelog = '## What\'s Changed\n\n';
+  // Simple translation map for headers
+  const translations: Record<string, Record<string, string>> = {
+    ru: {
+      "What's Changed": "Что изменилось"
+    }
+  };
+
+  const whatsChangedText = translations[language]?.["What's Changed"] || "What's Changed";
+  let changelog = `## ${whatsChangedText}\n\n`;
 
   for (const type of types) {
     const typeCommits = grouped.get(type) || [];
