@@ -18,6 +18,14 @@ Your task is to analyze Git commits and generate a comprehensive changelog that 
 - Why it matters to them
 - Any breaking changes or important notes
 
+## Core Workflow (IMPORTANT)
+
+1. **First, use tools**: When you receive commit information, your FIRST response must request tools to analyze commits
+2. **Analyze tool results**: After receiving tool results, understand the actual code changes
+3. **Generate changelog**: Create detailed, informative changelog based on tool analysis
+
+DO NOT skip step 1. The basic commit info provided is insufficient - you MUST use tools to get diffs and analyze impact.
+
 Guidelines:
 1. **Be clear and concise** - Users should quickly understand changes
 2. **Use proper categorization** - Group changes by type (features, fixes, etc.)
@@ -99,15 +107,32 @@ ${commitsByType}
 
 **Task**: Generate a professional, user-friendly changelog for this release.
 
-Requirements:
-- When listing commits, you MUST use the exact format shown above: "subject [hash] by @author"
-- DO NOT rewrite commits in a different format or omit the author information
-- You can add descriptions and context, but preserve the commit entries as provided
-- DO NOT add a statistics section at the end (it will be added automatically)
+## IMPORTANT: Tool Usage Required
 
-If you need more details about any commit (like viewing diffs, file changes, or impact analysis), use the provided tools first. After gathering all necessary information, create the final changelog.
+The commit information above is BASIC and MINIMAL. Before generating the changelog, you MUST:
 
-The changelog should be in markdown format and ready to be published as a GitHub release.
+1. **Use tools to analyze key commits**: Call get_commit_diff and analyze_commit_impact for important changes
+2. **Understand the actual code changes**: Don't just repeat commit messages, explain what actually changed
+3. **Wait for tool results**: After receiving tool results, generate the detailed changelog
+
+Example first response:
+\`\`\`json
+[
+  { "tool": "get_commit_diff", "arguments": { "sha": "abc123" } },
+  { "tool": "analyze_commit_impact", "arguments": { "sha": "abc123" } },
+  { "tool": "get_commit_diff", "arguments": { "sha": "def456" } }
+]
+\`\`\`
+
+## Changelog Requirements
+
+- When listing commits, preserve the exact format: "subject [hash] by @author"
+- DO NOT rewrite commits or omit author information
+- Add context and descriptions based on diffs and analysis from tools
+- DO NOT add statistics section (added automatically)
+- Use markdown formatting
+
+The changelog should be detailed, informative, and ready to publish as a GitHub release.
 `.trim();
 }
 
@@ -171,13 +196,26 @@ export function formatSimpleChangelog(
 export function parseToolRequests(response: string): Array<{ tool: string; arguments: Record<string, any> }> {
   const requests: Array<{ tool: string; arguments: Record<string, any> }> = [];
 
-  // Try to find JSON blocks
-  const jsonMatches = response.matchAll(/```json\s*(\{[\s\S]*?\})\s*```/g);
+  // Try to find JSON blocks (supports both single objects and arrays)
+  const jsonMatches = response.matchAll(/```json\s*([\s\S]*?)\s*```/g);
 
   for (const match of jsonMatches) {
     try {
       const parsed = JSON.parse(match[1]);
-      if (parsed.tool) {
+
+      // Handle array of tool requests
+      if (Array.isArray(parsed)) {
+        for (const item of parsed) {
+          if (item.tool) {
+            requests.push({
+              tool: item.tool,
+              arguments: item.arguments || {},
+            });
+          }
+        }
+      }
+      // Handle single tool request
+      else if (parsed.tool) {
         requests.push({
           tool: parsed.tool,
           arguments: parsed.arguments || {},

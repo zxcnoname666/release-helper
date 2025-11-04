@@ -310,7 +310,9 @@ function findCommit(sha: string, commits: CommitInfo[]): CommitInfo | undefined 
  */
 export function generateToolsDescription(): string {
   return `
-You have access to the following tools to gather information about commits:
+## Available Tools
+
+You MUST use these tools to gather detailed information before generating the final changelog:
 
 ${AI_TOOLS.map((tool, i) => `
 ${i + 1}. **${tool.name}**
@@ -318,7 +320,11 @@ ${i + 1}. **${tool.name}**
    Parameters: ${JSON.stringify(tool.parameters.properties, null, 2)}
 `).join('\n')}
 
-To use a tool, respond with a JSON object:
+## How to Use Tools
+
+To use a tool, respond with a JSON code block containing either:
+
+Single tool request:
 \`\`\`json
 {
   "tool": "tool_name",
@@ -326,6 +332,20 @@ To use a tool, respond with a JSON object:
 }
 \`\`\`
 
-You can request multiple tools, analyze the results, and then generate the final changelog.
+Multiple tool requests (preferred for efficiency):
+\`\`\`json
+[
+  { "tool": "tool_name_1", "arguments": { "param": "value" } },
+  { "tool": "tool_name_2", "arguments": { "param": "value" } }
+]
+\`\`\`
+
+## Required Workflow
+
+1. **First Response**: Use tools to gather details about key commits (get_commit_diff, analyze_commit_impact)
+2. **Wait for Tool Results**: System will provide results
+3. **Generate Changelog**: Use gathered information to create detailed, informative changelog
+
+DO NOT skip the tool usage step. The basic commit info provided is minimal - you need to use tools to get diffs and analyze impact.
 `.trim();
 }

@@ -46,16 +46,19 @@ export async function generateAIChangelog(
     info(`AI iteration ${iteration}/${MAX_ITERATIONS}`);
 
     const response = await callOpenAI(messages, config);
+    info(`AI response length: ${response.length} chars`);
+
     const toolRequests = parseToolRequests(response);
 
     // If no tool requests, we have the final response
     if (toolRequests.length === 0) {
+      info('No tool requests found, treating as final response');
       finalResponse = response;
       break;
     }
 
     // Execute tools
-    info(`Executing ${toolRequests.length} tool(s)...`);
+    info(`Found ${toolRequests.length} tool request(s): ${toolRequests.map(r => r.tool).join(', ')}`);
     const toolResults: string[] = [];
 
     for (const request of toolRequests) {

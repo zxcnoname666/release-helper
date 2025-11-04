@@ -3,7 +3,8 @@ node_modules/
 package-lock.json
 
 # Build output
-# Note: dist/out.js is committed for GitHub Actions
+# Note: dist/ should be built and committed only before releases
+dist/
 
 # IDE
 .vscode/
