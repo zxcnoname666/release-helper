@@ -517,4 +517,16 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 [Report Bug](https://github.com/zxcnoname666/release-helper/issues) • [Request Feature](https://github.com/zxcnoname666/release-helper/issues) • [Documentation](https://github.com/zxcnoname666/release-helper#readme)
 
+---
+
+<img src="https://count.getloli.com/get/@release-helper">
+
+ <a href="https://github.com/zxcnoname666/Release-Helper">
+  <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zxcnoname666/Release-Helper&type=date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zxcnoname666/Release-Helper&type=date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zxcnoname666/Release-Helper&type=date" />
+  </picture>
+ </a>
+</p>
 </div>
