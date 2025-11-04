@@ -103,7 +103,23 @@ export async function generateAIChangelog(
     throw new Error('AI did not provide a final response after tool use');
   }
 
-  return cleanupResponse(finalResponse);
+  // Log before cleanup for debugging
+  info(`Final response length before cleanup: ${finalResponse.length} chars`);
+
+  // Clean up the response
+  const cleaned = cleanupResponse(finalResponse);
+
+  // Validate that cleanup didn't remove all content
+  if (!cleaned || cleaned.trim().length === 0) {
+    warning('Cleanup removed all content from AI response, returning original');
+    info(`Original response length: ${finalResponse.length} chars`);
+    info(`Response preview: ${finalResponse.substring(0, 200)}...`);
+    // Return original if cleanup was too aggressive
+    return finalResponse.trim();
+  }
+
+  info(`Final response length after cleanup: ${cleaned.length} chars`);
+  return cleaned;
 }
 
 /**
@@ -155,11 +171,31 @@ async function callOpenAI(
  * Clean up AI response (remove thinking blocks, extra formatting)
  */
 function cleanupResponse(response: string): string {
-  // Remove thinking blocks
-  let cleaned = response.replace(/<think>[\s\S]*?<\/think>/g, '');
+  let cleaned = response;
 
-  // Remove tool request blocks (only those with "tool" and "arguments" fields)
-  cleaned = cleaned.replace(/```json\s*(\[[\s\S]*?"tool"[\s\S]*?\]|\{[\s\S]*?"tool"[\s\S]*?\})\s*```/g, '');
+  // Remove thinking blocks (but be careful not to remove everything)
+  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/g, '');
+
+  // Remove tool request blocks - only if they contain "tool" field
+  // Match more precisely: ```json followed by array/object with "tool" field
+  const toolBlockRegex = /```json\s*(\[[\s\S]*?\]|\{[\s\S]*?\})\s*```/g;
+  cleaned = cleaned.replace(toolBlockRegex, (match, jsonContent) => {
+    try {
+      // Only remove if it's a valid tool request
+      const parsed = JSON.parse(jsonContent);
+      if (Array.isArray(parsed) && parsed.some(item => item.tool)) {
+        return ''; // Remove tool request arrays
+      }
+      if (parsed.tool) {
+        return ''; // Remove single tool request objects
+      }
+      // Keep other JSON blocks
+      return match;
+    } catch {
+      // If can't parse, keep the original
+      return match;
+    }
+  });
 
   // Remove multiple consecutive newlines
   cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
