@@ -30,7 +30,10 @@ Output format:
 - Start with a brief summary (2-3 sentences) highlighting key changes
 - Group changes by category with emoji headers
 - List breaking changes prominently if any
-- Include statistics section at the end
+- When listing individual commits, you MUST preserve the exact format: "subject [hash] by @author"
+- Example: "Add new feature [a1b2c3d] by @username"
+- DO NOT omit the author attribution or change the commit format
+- DO NOT add statistics section - it will be added automatically
 - Use markdown formatting for links, code, emphasis
 
 ${generateToolsDescription()}
@@ -95,6 +98,12 @@ ${commitsByType}
 ---
 
 **Task**: Generate a professional, user-friendly changelog for this release.
+
+Requirements:
+- When listing commits, you MUST use the exact format shown above: "subject [hash] by @author"
+- DO NOT rewrite commits in a different format or omit the author information
+- You can add descriptions and context, but preserve the commit entries as provided
+- DO NOT add a statistics section at the end (it will be added automatically)
 
 If you need more details about any commit (like viewing diffs, file changes, or impact analysis), use the provided tools first. After gathering all necessary information, create the final changelog.
 
