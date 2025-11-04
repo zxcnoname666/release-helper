@@ -15,7 +15,6 @@ The security of Release Helper is a top priority. If you discover a security vul
 
 Contact us directly at:
 - **GitHub Security Advisories**: [Report a vulnerability](https://github.com/zxcnoname666/release-helper/security/advisories/new) (preferred)
-- **Email**: [your-email@example.com] (if you prefer email)
 
 **2. Include Details**
 
