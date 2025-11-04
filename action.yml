@@ -1,6 +1,14 @@
-name: "Auto Release /w AI Summary"
-description: "Advanced GitHub Action for automated releases with AI-powered changelog generation"
-author: "zxcnoname666"
+name: 'Release Helper - AI-Powered Release Automation'
+description: '🤖 Automate releases with AI-generated changelogs, semantic versioning, Discord notifications'
+author: 'zxcnoname666'
+
+branding:
+  icon: 'package'
+  color: 'blue'
+
+runs:
+  using: "node20"
+  main: "dist/out.js"
 
 inputs:
   GITHUB_TOKEN:
@@ -47,11 +55,3 @@ inputs:
     description: "Язык для генерации changelog (en, ru, и т.д.)"
     required: false
     default: "en"
-
-runs:
-  using: "node20"
-  main: "dist/out.js"
-
-branding:
-  icon: "package"
-  color: "blue"
