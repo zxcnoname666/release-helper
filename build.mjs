@@ -22,6 +22,10 @@ const sharedConfig = {
   sourcemap: false,
   treeShaking: true,
   logLevel: 'info',
+  // Ensure Node.js globals like fetch are available
+  define: {
+    'global': 'globalThis',
+  },
 };
 
 try {

@@ -108,7 +108,7 @@ export function formatCommit(parsed: ParsedCommit, includeType = true): string {
   const scopeStr = scope ? `(${scope})` : '';
   const typeStr = includeType ? `**${type}${scopeStr}**: ` : '';
 
-  return `${typeStr}${subject} [\`${shortSha}\`] by @${author}`;
+  return `${typeStr}${subject} [${shortSha}] by @${author}`;
 }
 
 /**

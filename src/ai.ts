@@ -18,8 +18,9 @@ interface OpenAIConfig {
 
 /**
  * Maximum iterations for tool use loop
+ * Increased to handle repositories with many commits
  */
-const MAX_ITERATIONS = 3;
+const MAX_ITERATIONS = 15;
 
 /**
  * Generate changelog using AI with tool support
@@ -98,27 +99,38 @@ async function callOpenAI(
     ? config.baseUrl
     : `${config.baseUrl}/chat/completions`.replace(/\/+/g, '/');
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${config.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: config.model,
-      messages,
-      temperature: 0.7,
-      max_tokens: 2000,
-    }),
-  });
+  try {
+    // Use globalThis.fetch to ensure compatibility with bundled code
+    const fetchFn = globalThis.fetch || fetch;
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+    const response = await fetchFn(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages,
+        temperature: 0.7,
+        max_tokens: 2000,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || '';
+  } catch (error: any) {
+    // Provide more detailed error information
+    if (error.cause) {
+      throw new Error(`Network error calling OpenAI API: ${error.message} (${error.cause})`);
+    }
+    throw new Error(`Failed to call OpenAI API: ${error.message}`);
   }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || '';
 }
 
 /**
