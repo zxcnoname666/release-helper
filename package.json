@@ -3,7 +3,6 @@
   "version": "2.0.0",
   "description": "Advanced GitHub Action for automated releases with AI-powered changelog generation",
   "main": "dist/out.js",
-  "type": "module",
   "scripts": {
     "build": "node build.mjs",
     "dev": "node --watch src/index.ts",
