@@ -185,8 +185,6 @@ export function formatSimpleChangelog(
     changelog += '\n';
   }
 
-  changelog += generateStatsSection(stats, versionInfo, repository);
-
   return changelog;
 }
 
