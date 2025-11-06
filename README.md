@@ -83,6 +83,14 @@ Send beautiful release notifications with:
 - Direct GitHub release links
 - Custom colors and formatting
 
+### 🌍 Multilingual Support
+Generate changelogs in any language:
+- Support for **English**, **Russian**, **Spanish**, **German**, and more
+- AI translates descriptive text naturally
+- Preserves technical details (hashes, usernames, URLs)
+- Maintains markdown formatting across languages
+- Simply set `LANGUAGE` parameter to your preferred locale
+
 ### 🔐 Secure & Flexible
 - Supports custom OpenAI endpoints
 - Optional AI features (works without API key)
@@ -158,6 +166,7 @@ The action will automatically:
 | `OPENAI_API_KEY` | - | OpenAI API key for AI changelogs *(optional)* |
 | `OPENAI_API_MODEL` | `gpt-4` | Model: `gpt-4`, `gpt-4-turbo`, `gpt-3.5-turbo` |
 | `OPENAI_API_BASE_URL` | `https://api.openai.com/v1` | Custom endpoint support |
+| `LANGUAGE` | `en` | Changelog language: `en`, `ru`, `es`, `de`, etc. |
 
 ### Build & Test Configuration
 
@@ -197,6 +206,7 @@ The action will automatically:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     OPENAI_API_MODEL: gpt-4-turbo
+    LANGUAGE: en  # Changelog language (en, ru, es, de, etc.)
     BUILD_COMMAND: "npm run build"
     LINT_AND_TESTS_COMMAND: "npm test && npm run lint"
     ASSET_PATTERNS: "dist/**/*.zip dist/**/*.tar.gz"
@@ -221,6 +231,35 @@ The action will automatically:
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     OPENAI_API_BASE_URL: "https://api.your-proxy.com/v1"
 ```
+
+### Multilingual Changelogs
+
+Generate changelogs in different languages:
+
+```yaml
+# Russian changelog
+- uses: zxcnoname666/release-helper@main
+  with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    LANGUAGE: ru
+
+# Spanish changelog
+- uses: zxcnoname666/release-helper@main
+  with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    LANGUAGE: es
+
+# German changelog
+- uses: zxcnoname666/release-helper@main
+  with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    LANGUAGE: de
+```
+
+> **Note**: Technical details (commit hashes, usernames, URLs) remain in their original form regardless of language.
 
 ---
 
