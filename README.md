@@ -512,7 +512,7 @@ dist/
 
 | Project | Description |
 |---------|-------------|
-| [AI Code Reviewer](https://github.com/zxcnoname666/ai-code-reviewer) | AI-powered code review automation |
+| [AI Code Review](https://github.com/zxcnoname666/AI-Code-Review) | AI-powered code review automation |
 
 ---
 
