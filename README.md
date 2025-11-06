@@ -567,5 +567,4 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zxcnoname666/Release-Helper&type=date" />
   </picture>
  </a>
-</p>
 </div>
