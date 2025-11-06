@@ -1,57 +1,78 @@
-name: 'Release Helper - AI-Powered Release Automation'
-description: '🤖 Automate releases with AI-generated changelogs, semantic versioning, Discord notifications'
+name: 'AI Code Review - Advanced Analysis'
+description: '🤖 Advanced AI-powered code review with AST analysis, linters, dependency tracking, and beautiful statistics'
 author: 'zxcnoname666'
 
 branding:
-  icon: 'package'
-  color: 'blue'
+  icon: 'search'
+  color: 'purple'
 
 runs:
-  using: "node20"
-  main: "dist/out.js"
+  using: 'node20'
+  main: 'dist/out.js'
 
 inputs:
   GITHUB_TOKEN:
-    description: "GitHub token to interact with the repository"
+    description: 'GitHub token for API access'
     required: true
-  LINT_AND_TESTS_COMMAND:
-    description: "Команда для lint и test"
-    required: false
-    # default: "deno lint && deno test"
-  BUILD_COMMAND:
-    description: "Команда сборки проекта"
-    required: false
-    # default: "deno task build"
-  ASSET_PATTERNS:
-    description: "Glob-шаблоны файлов-артефактов для загрузки"
-    required: false
+
   OPENAI_API_KEY:
-    description: "API-ключ OpenAI для генерации сводки"
+    description: 'OpenAI API key for AI-powered code review'
     required: false
+
   OPENAI_API_MODEL:
-    description: "Модель OpenAI для генерации сводки"
+    description: 'OpenAI model to use (gpt-4, gpt-4-turbo, gpt-3.5-turbo)'
     required: false
-    default: "gpt-4"
+    default: 'gpt-4'
+
   OPENAI_API_BASE_URL:
-    description: "Endpoint для OpenAI-based AI."
+    description: 'OpenAI API base URL (for custom endpoints or proxies)'
     required: false
-    default: "https://api.openai.com/v1/chat/completions"
-  ALLOWED_BRANCH:
-    description: "Ветка, из которой разрешены релизы"
+    default: 'https://api.openai.com/v1'
+
+  REVIEW_LANGUAGE:
+    description: 'Language for review comments (en, ru, es, fr, de, etc.)'
     required: false
-    default: "main"
-  DRAFT_RELEASE:
-    description: "Создавать ли черновой релиз"
+    default: 'en'
+
+  SILENT_MODE:
+    description: 'Post reviews as silent comments to reduce notifications'
     required: false
-    default: "false"
-  PRERELEASE:
-    description: "Создавать ли пререлиз"
+    default: 'false'
+
+  MAX_CHUNK_SIZE:
+    description: 'Maximum tokens per chunk for large PRs'
     required: false
-    default: "false"
-  DISCORD_WEBHOOK:
-    description: "URL Discord webhook для уведомлений"
+    default: '6000'
+
+  ENABLE_LINTERS:
+    description: 'Run linters on changed files (ESLint, Pylint, etc.)'
     required: false
-  LANGUAGE:
-    description: "Язык для генерации changelog (en, ru, и т.д.)"
+    default: 'true'
+
+  ENABLE_AST:
+    description: 'Enable AST (Abstract Syntax Tree) analysis for deep code understanding'
     required: false
-    default: "en"
+    default: 'true'
+
+  ENABLE_DEPENDENCY_ANALYSIS:
+    description: 'Analyze function dependencies and call graphs'
+    required: false
+    default: 'true'
+
+  SEVERITY_THRESHOLD:
+    description: 'Minimum severity level to report (info, warning, error)'
+    required: false
+    default: 'warning'
+
+outputs:
+  review_status:
+    description: 'Review status: approved, needs-changes, or rejected'
+
+  issues_found:
+    description: 'Total number of issues found'
+
+  critical_issues:
+    description: 'Number of critical issues found'
+
+  review_url:
+    description: 'URL to the review comment'

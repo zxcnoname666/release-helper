@@ -1,18 +1,18 @@
-# 🚀 Release Helper - AI-Powered GitHub Release Automation Action
+# 🤖 AI Code Review - Advanced Analysis
 
 <div align="center">
 
-![Release Helper Banner](https://img.shields.io/badge/Release_Automation-AI_Powered-blue?style=for-the-badge&logo=github-actions)
+![AI Code Review Banner](https://img.shields.io/badge/AI_Code_Review-Advanced_Analysis-purple?style=for-the-badge&logo=github-actions)
 
-**Automated GitHub Release Management | AI Changelog Generator | Smart Version Bumping**
+**AI-Powered Code Review | Deep Static Analysis | Beautiful Statistics**
 
-[![GitHub Release](https://img.shields.io/github/v/release/zxcnoname666/release-helper?style=flat-square&logo=github)](https://github.com/zxcnoname666/release-helper/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/zxcnoname666/Release-Helper?style=flat-square&logo=github)](https://github.com/zxcnoname666/Release-Helper/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Compatible-2088FF?style=flat-square&logo=github-actions)](https://github.com/features/actions)
-[![OpenAI](https://img.shields.io/badge/OpenAI-Powered-412991?style=flat-square&logo=openai)](https://openai.com/)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat-square)](https://nodejs.org)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4-412991?style=flat-square&logo=openai)](https://openai.com/)
 
-[Quick Start](#-quick-start) • [Features](#-key-features) • [Configuration](#%EF%B8%8F-configuration) • [Examples](#-usage-examples) • [Documentation](#-documentation)
+[Quick Start](#-quick-start) • [Features](#-features) • [Configuration](#-configuration) • [Examples](#-example-output) • [Development](#-development)
 
 </div>
 
@@ -20,492 +20,334 @@
 
 ## 📋 Overview
 
-**Release Helper** is an advanced **GitHub Action** that revolutionizes release management through **AI-powered automation**. Eliminate manual changelog writing, automate semantic versioning, and streamline your CI/CD pipeline with intelligent release note generation powered by **OpenAI GPT models**.
+**AI Code Review** is a next-generation GitHub Action that transforms pull request reviews through **advanced AI analysis** and **deep code understanding**. Powered by OpenAI GPT-4, it provides senior-level code reviews with AST parsing, linter integration, dependency tracking, and stunning visual statistics.
 
-Perfect for developers seeking automated release workflows, AI-generated changelogs, and seamless version control integration.
+### 🎯 Why AI Code Review?
 
-### 🎯 Why Release Helper?
-
-- ⏱️ **Save Hours** - Automate changelog writing and version management
-- 🤖 **AI Intelligence** - GPT-powered analysis understands your code changes
-- 📈 **Better Documentation** - Generate comprehensive, human-readable release notes
-- 🔄 **Zero Config** - Works out of the box with sensible defaults
-- 🎨 **Rich Integrations** - Discord notifications, custom formatting, and more
+- 🧠 **Senior-Level Reviews** - AI thinks like an experienced developer
+- 🔍 **Deep Analysis** - AST parsing, complexity metrics, call graphs
+- 🎨 **Beautiful Stats** - ASCII charts, graphs, and visual reports
+- 🛠️ **Tool-Powered** - AI actively investigates code with analysis tools
+- 🌍 **Multi-Language** - Reviews in any language (English, Russian, etc.)
+- 📦 **Smart Chunking** - Handles massive PRs efficiently
 
 ---
 
-## ✨ Key Features
+## ✨ Features
 
-### 🤖 AI-Powered Changelog Generation
-Leverage **OpenAI GPT-4** to automatically generate intelligent, context-aware release notes. The AI analyzes commit messages, code diffs, and project context to create comprehensive changelogs that explain what changed and why.
+### 🧠 **AI-Powered Intelligence**
 
-### 📊 Comprehensive Release Statistics
-Track detailed metrics for every release:
-- **Files Changed** - Total modified files count
-- **Code Changes** - Line additions and deletions
-- **Contributors** - Active developers in the release
-- **Timeline** - Days since last release
-- **Commit Analysis** - Type breakdown (features, fixes, chores)
+- **GPT-4 Integration**: Context-aware, comprehensive code reviews
+- **Tool Calling System**: AI uses 10+ analysis tools to investigate code
+- **Multi-Language Support**: Review comments in any language
+- **Senior-Level Feedback**: Explains the "why" behind suggestions
 
-### 🧠 Intelligent Commit Parsing
-Advanced **Conventional Commits** parser that:
-- Extracts multiple commit types from single commits
-- Identifies breaking changes automatically
-- Groups related changes intelligently
-- Handles complex commit message formats
+### 🔍 **Advanced Code Analysis**
 
-### 🔧 AI Tools System for Deep Analysis
-Provides AI with specialized tools:
-- **get_commit_details** - Full commit context with statistics
-- **get_commit_diff** - View actual code changes
-- **get_changed_files** - Directory-grouped file listings
-- **get_commits_by_type** - Filter by conventional commit type
-- **analyze_commit_impact** - Assess change scope and impact
+- **AST Parsing**: Extract functions, classes, dependencies from code
+- **Linter Integration**: Auto-runs ESLint, Pylint, and more
+- **Dependency Tracking**: Maps function calls and dependencies
+- **Complexity Metrics**: Cyclomatic complexity, maintainability index
+- **Call Graph Analysis**: Understand function relationships and impact
 
-### 🎯 Automatic Semantic Versioning (SemVer)
-Smart version bumping based on:
-- Commit message conventions
-- Breaking change detection
-- Manual version control via commit tags
-- Supports **patch**, **minor**, and **major** releases
+### 📊 **Beautiful Statistics**
 
-### ⚡ Fast & Efficient Build System
-- Built with **TypeScript 5.6** for type safety
-- **esbuild** compilation (~180ms build time)
-- Optimized for GitHub Actions runtime
-- Minimal dependencies for fast execution
+```
+╔════════════════════════════════════════╗
+║  ✅ LOOKS GOOD                         ║
+║  Issues: 2 | Critical: 0 | Warnings: 2 ║
+╚════════════════════════════════════════╝
 
-### 🔔 Rich Discord Integration
-Send beautiful release notifications with:
-- Embedded release information
-- Contributor highlights
-- Change summaries
-- Direct GitHub release links
-- Custom colors and formatting
+## 🎯 Issues Found
+Critical  ░░░░░░░░░░░░░░░░░░░░ 0
+Warnings  ████████░░░░░░░░░░░░ 2
+Info      ░░░░░░░░░░░░░░░░░░░░ 0
 
-### 🔐 Secure & Flexible
-- Supports custom OpenAI endpoints
-- Optional AI features (works without API key)
-- Configurable branch protection
-- Draft and pre-release options
+## 🎚️ Average Complexity
+┌──────────────────────────────┐
+│  ✅ LOW         4.5          │
+│  ░░░░░░░░█░░░░░░░░░░░░░░░   │
+└──────────────────────────────┘
+```
+
+### 🎯 **Smart Features**
+
+- **Intelligent Chunking**: Splits large PRs optimally
+- **Silent Mode**: Reduce notification spam
+- **Auto Labeling**: Manages PR labels based on review
+- **Inline Comments**: Issues posted on specific lines
+- **Severity Levels**: Filter by critical, warning, info
 
 ---
 
 ## 🚀 Quick Start
 
-### Step 1: Add Workflow File
+### Basic Setup
 
-Create `.github/workflows/release.yml`:
+Create `.github/workflows/ai-review.yml`:
 
 ```yaml
-name: Automated Release
+name: AI Code Review
 
 on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: write
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  release:
+  review:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Required for changelog generation
-          
-      - name: Auto Release with AI
-        uses: zxcnoname666/release-helper@main
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: AI Code Review
+        uses: zxcnoname666/Release-Helper@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-### Step 2: Trigger Release
+### Advanced Configuration
 
-Commit with release command:
-
-```bash
-git commit -m "feat: add awesome new feature
-!release: minor"
-git push
+```yaml
+- name: AI Code Review
+  uses: zxcnoname666/Release-Helper@v3
+  with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    OPENAI_API_MODEL: 'gpt-4-turbo'
+    REVIEW_LANGUAGE: 'ru'      # Review in Russian
+    SILENT_MODE: 'true'        # Reduce notifications
+    ENABLE_AST: 'true'         # Deep code analysis
+    ENABLE_LINTERS: 'true'     # Run linters
+    MAX_CHUNK_SIZE: '8000'     # Larger chunks
 ```
-
-### Step 3: Enjoy Automated Releases! 🎉
-
-The action will automatically:
-1. ✅ Analyze all commits since last release
-2. 🤖 Generate AI-powered changelog
-3. 📦 Create GitHub release with notes
-4. 🏷️ Tag version in git
-5. 🔔 Send Discord notification (if configured)
 
 ---
 
 ## ⚙️ Configuration
 
-### Required Parameters
+### Required Inputs
 
-| Parameter | Description |
-|-----------|-------------|
-| `GITHUB_TOKEN` | GitHub token for API access (automatic in Actions) |
+| Input | Description |
+|-------|-------------|
+| `GITHUB_TOKEN` | GitHub token (auto-provided) |
 
-### AI Configuration
+### Optional Inputs
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `OPENAI_API_KEY` | - | OpenAI API key for AI changelogs *(optional)* |
-| `OPENAI_API_MODEL` | `gpt-4` | Model: `gpt-4`, `gpt-4-turbo`, `gpt-3.5-turbo` |
-| `OPENAI_API_BASE_URL` | `https://api.openai.com/v1` | Custom endpoint support |
-
-### Build & Test Configuration
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `BUILD_COMMAND` | - | Pre-release build command *(optional)* |
-| `LINT_AND_TESTS_COMMAND` | - | Testing command before release *(optional)* |
-| `ASSET_PATTERNS` | - | Glob patterns for release assets |
-
-### Release Configuration
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `ALLOWED_BRANCH` | `main` | Branch allowed for releases |
-| `DRAFT_RELEASE` | `false` | Create as draft release |
-| `PRERELEASE` | `false` | Mark as pre-release |
-| `DISCORD_WEBHOOK` | - | Discord webhook URL for notifications |
+| Input | Description | Default |
+|-------|-------------|---------|
+| `OPENAI_API_KEY` | OpenAI API key | - |
+| `OPENAI_API_MODEL` | Model (`gpt-4`, `gpt-4-turbo`, `gpt-3.5-turbo`) | `gpt-4` |
+| `OPENAI_API_BASE_URL` | Custom endpoint (Azure, etc.) | `https://api.openai.com/v1` |
+| `REVIEW_LANGUAGE` | Review language (`en`, `ru`, `es`, `fr`, etc.) | `en` |
+| `SILENT_MODE` | Minimize notifications | `false` |
+| `MAX_CHUNK_SIZE` | Max tokens per chunk | `6000` |
+| `ENABLE_LINTERS` | Run linters | `true` |
+| `ENABLE_AST` | AST analysis | `true` |
+| `ENABLE_DEPENDENCY_ANALYSIS` | Dependency tracking | `true` |
+| `SEVERITY_THRESHOLD` | Min severity (`info`, `warning`, `error`) | `warning` |
 
 ---
 
-## 📖 Usage Examples
+## 📖 How It Works
 
-### Basic Usage with AI
+### 1. Fetch PR
+- Retrieves PR details and changed files
+- Analyzes file types and languages
+
+### 2. Smart Chunking
+- Splits large PRs intelligently
+- Groups related files by module
+- Optimizes token usage
+
+### 3. Deep Analysis
+- **AST Parsing**: Extracts code structure
+- **Linting**: Runs appropriate linters
+- **Complexity**: Calculates metrics
+- **Call Graph**: Maps dependencies
+
+### 4. AI Review with Tools
+The AI has access to 10+ analysis tools:
+
+- `read_file` - Read full file content
+- `get_file_diff` - View specific changes
+- `analyze_file_ast` - Deep AST analysis
+- `find_function_callers` - Find usage
+- `find_function_dependencies` - Check dependencies
+- `run_linter` - Execute linters
+- `search_code` - Search patterns
+- `get_commit_info` - Commit details
+- `analyze_function_complexity` - Metrics
+
+The AI **actively uses tools** before reviewing for accurate feedback.
+
+### 5. Generate Review
+- Categorizes issues by severity
+- Provides code examples and fixes
+- Recognizes good code
+- Creates beautiful statistics
+
+### 6. Post to GitHub
+- Posts comprehensive review
+- Adds inline comments
+- Manages labels automatically
+- Supports silent mode
+
+---
+
+## 📊 Example Output
+
+### Statistics Report
+
+```
+╔══════════════════════════════════════════════════════════════════════╗
+║        🤖  AI CODE REVIEW - ANALYSIS COMPLETE  🤖                    ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+## 📊 Review Overview
+
+┌─────────────────────────────────────────────────────────────┐
+│  Files Reviewed      │ 15                                    │
+│  Total Lines Changed │ 450                                   │
+│  Lines Added         │ +320                                  │
+│  Lines Deleted       │ -130                                  │
+│  Review Time         │ 45s                                   │
+│  Tokens Used         │ 8,450                                 │
+└─────────────────────────────────────────────────────────────┘
+
+## 🎯 Issues Found
+
+Critical  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0
+Warnings  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 2
+Info      ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0
+
+## 📁 Issues by Category
+
+🐛 bug              ████████░░░░░░░░░░ 1 (33%)
+⚡ performance      ████████░░░░░░░░░░ 1 (33%)
+⭐ best-practice   ████░░░░░░░░░░░░░░ 1 (33%)
+
+## 🎚️ Average Complexity
+
+┌─────────────────────────────────────────┐
+│  Complexity Gauge                       │
+├─────────────────────────────────────────┤
+│      ✅ LOW            4.5              │
+│  ░░░░░░░░░█░░░░░░░░░░░░░░░░░░░░░░░░░   │
+│  0                                  30+ │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 🌟 Advanced Use Cases
+
+### Custom OpenAI Endpoint (Azure)
 
 ```yaml
-- uses: zxcnoname666/release-helper@main
+- uses: zxcnoname666/Release-Helper@v3
+  with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+    OPENAI_API_BASE_URL: 'https://your-resource.openai.azure.com/v1'
+    OPENAI_API_MODEL: 'gpt-4'
+```
+
+### Multi-Language Teams
+
+```yaml
+- uses: zxcnoname666/Release-Helper@v3
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    REVIEW_LANGUAGE: 'ru'  # Russian reviews
 ```
 
-### Full-Featured Setup
+### High-Performance Setup
 
 ```yaml
-- uses: zxcnoname666/release-helper@main
+- uses: zxcnoname666/Release-Helper@v3
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-    OPENAI_API_MODEL: gpt-4-turbo
-    BUILD_COMMAND: "npm run build"
-    LINT_AND_TESTS_COMMAND: "npm test && npm run lint"
-    ASSET_PATTERNS: "dist/**/*.zip dist/**/*.tar.gz"
-    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-```
-
-### Without AI (Traditional Changelog)
-
-```yaml
-- uses: zxcnoname666/release-helper@main
-  with:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    # No OPENAI_API_KEY - uses conventional commits only
-```
-
-### Custom OpenAI Endpoint
-
-```yaml
-- uses: zxcnoname666/release-helper@main
-  with:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-    OPENAI_API_BASE_URL: "https://api.your-proxy.com/v1"
+    OPENAI_API_MODEL: 'gpt-4-turbo'
+    MAX_CHUNK_SIZE: '12000'
+    SILENT_MODE: 'true'
 ```
 
 ---
 
-## 🎯 Commit Message Format
-
-### Release Triggering
-
-Add release command to commit message:
-
-```bash
-# Patch release (0.0.x) - Bug fixes
-git commit -m "fix: resolve memory leak
-!release: patch"
-
-# Minor release (0.x.0) - New features
-git commit -m "feat: add user authentication
-!release: minor"
-
-# Major release (x.0.0) - Breaking changes
-git commit -m "feat!: redesign API endpoints
-!release: major"
-```
-
-### Conventional Commits Support
-
-Follows [Conventional Commits](https://www.conventionalcommits.org/) specification:
-
-| Type | Description | Changelog Section |
-|------|-------------|-------------------|
-| `feat:` | New features | ✨ Features |
-| `fix:` | Bug fixes | 🐛 Bug Fixes |
-| `docs:` | Documentation | 📝 Documentation |
-| `style:` | Code style | 💄 Styles |
-| `refactor:` | Code refactoring | ♻️ Refactoring |
-| `perf:` | Performance improvements | ⚡ Performance |
-| `test:` | Test updates | ✅ Tests |
-| `build:` | Build system | 🏗️ Build |
-| `ci:` | CI configuration | 👷 CI |
-| `chore:` | Maintenance | 🔧 Chores |
-
-### Multi-Type Commits
-
-Include multiple changes in one commit:
-
-```bash
-git commit -m "feat: add OAuth2 login
-fix: resolve session timeout issue
-docs: update authentication guide
-!release: minor"
-```
-
-Generates:
-- ✨ **Features**: add OAuth2 login
-- 🐛 **Bug Fixes**: resolve session timeout issue
-- 📝 **Documentation**: update authentication guide
-
----
-
-## 🤖 AI Tools & Intelligence
-
-The AI has access to specialized tools for comprehensive analysis:
-
-### Available Tools
-
-#### 1. `get_commit_details`
-Retrieves comprehensive commit information:
-- Full commit message and metadata
-- Author and timestamp
-- Change statistics (+additions / -deletions)
-- Parsed conventional commit types
-- Breaking change indicators
-
-#### 2. `get_commit_diff`
-Views actual code changes:
-- File-by-file diff view
-- Automatic truncation for large diffs
-- Syntax-aware diff formatting
-- Context preservation
-
-#### 3. `get_changed_files`
-Lists modified files:
-- Grouped by directory structure
-- Change type indicators (added/modified/deleted)
-- File count statistics
-- Path-based organization
-
-#### 4. `get_commits_by_type`
-Filters commits by type:
-- Group by conventional commit type
-- Feature/fix/chore separation
-- Breaking change isolation
-- Type-specific analysis
-
-#### 5. `analyze_commit_impact`
-Assesses change scope:
-- Impact level (minor/moderate/major)
-- Affected system areas
-- Breaking change detection
-- Risk assessment
-
-### AI Workflow Example
-
-```
-User triggers release → AI analyzes commits
-                     ↓
-      AI requests: get_commit_details("abc123")
-                     ↓
-      Returns: { message, stats, types, ... }
-                     ↓
-      AI requests: get_commit_diff("abc123")
-                     ↓
-      Returns: { files, additions, deletions }
-                     ↓
-      AI generates: Intelligent changelog with context
-```
-
-This enables:
-- ✅ Understanding full context of changes
-- ✅ Intelligent grouping of related commits
-- ✅ Highlighting important changes
-- ✅ Explaining breaking changes with migration notes
-- ✅ Generating accurate, helpful release notes
-
----
-
-## 📋 Generated Changelog Format
-
-### AI-Generated Example
-
-```markdown
-## What's Changed
-
-This release introduces OAuth2 authentication and resolves critical performance 
-issues with the session management system. Breaking changes require updating 
-client configurations.
-
-### ✨ Features
-- **auth**: add OAuth2 support with multiple providers [`a1b2c3d`] by @developer
-- **api**: implement rate limiting middleware [`e4f5g6h`] by @contributor
-- **ui**: redesign login page with modern UI [`i7j8k9l`] by @designer
-
-### 🐛 Bug Fixes
-- **core**: fix memory leak in session handler [`m1n2o3p`] by @maintainer
-- **api**: resolve timeout issues with large payloads [`q4r5s6t`] by @developer
-
-### 💥 Breaking Changes
-- **auth**: OAuth2 migration requires updating client IDs in configuration
-- **api**: Rate limiting now requires API keys for all requests
-
-### 📝 Documentation
-- **readme**: update authentication setup guide [`u7v8w9x`] by @writer
-
----
-
-###### 📊 Release Statistics
-Files changed: 24 | Additions: 342 | Deletions: 156 | Days since last release: 7
-Contributors: 4 | Commits: 15
-
-**Full changes**: https://github.com/owner/repo/compare/1.0.0...1.1.0
-```
-
----
-
-## 🔔 Discord Integration
-
-Rich embeds with release information:
-
-```yaml
-- uses: zxcnoname666/release-helper@main
-  with:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-```
-
-Sends notifications with:
-- 🎉 Release version and type
-- 📊 Commit count and contributors
-- 📝 Files changed summary
-- ⚠️ Breaking change warnings
-- 🔗 Direct link to GitHub release
-
----
-
-## 🏗️ Project Architecture
-
-```
-src/
-├── index.ts          # Main entry point and orchestration
-├── types.ts          # TypeScript type definitions
-├── version.ts        # Version management and SemVer operations
-├── git.ts            # Git operations (commits, diffs, stats)
-├── commits.ts        # Commit parsing and conventional commits
-├── github.ts         # GitHub API integration
-├── ai.ts             # AI integration and changelog generation
-├── ai-tools.ts       # Tool definitions for AI context
-├── prompts.ts        # AI system and user prompts
-└── utils.ts          # Utility functions
-```
-
-### Technology Stack
-
-- **Runtime**: Node.js 20+ (ES Modules)
-- **Language**: TypeScript 5.6 (strict mode)
-- **Build**: esbuild (ultra-fast ~180ms)
-- **Commits**: Conventional Commits parser
-- **AI**: OpenAI API (GPT-5 support), Gemini, Claude
-- **CI/CD**: GitHub Actions native
-
----
-
-## 💻 Development
+## 🛠️ Development
 
 ### Prerequisites
-
-- Node.js 20+ (LTS recommended)
-- pnpm package manager
-- Git version control
+- Node.js 20+
+- pnpm 9+
 
 ### Setup
-
 ```bash
-# Clone repository
-git clone https://github.com/zxcnoname666/release-helper.git
-cd release-helper
-
-# Install dependencies
+git clone https://github.com/zxcnoname666/Release-Helper.git
+cd Release-Helper
 pnpm install
-
-# Build project
-pnpm run build
-
-# Type checking
-pnpm run type-check
-
-# Watch mode (development)
-pnpm run dev
+pnpm build
 ```
 
-### Build Output
-
-```bash
-dist/
-└── index.js    # Bundled action (~180ms build time)
+### Project Structure
 ```
-
----
-
-## 🔗 Related Projects
-
-| Project | Description |
-|---------|-------------|
-| [AI Code Reviewer](https://github.com/zxcnoname666/ai-code-reviewer) | AI-powered code review automation |
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file for details.
+src/
+├── index.ts              # Entry point
+├── types/                # TypeScript types
+├── ai/                   # AI client & prompts
+│   ├── client.ts
+│   ├── prompts.ts
+│   └── tools-registry.ts
+├── analysis/             # Code analysis
+│   ├── ast-parser.ts
+│   ├── linter-runner.ts
+│   └── call-graph.ts
+├── chunking/             # Smart chunking
+├── github/               # GitHub API
+├── stats/                # Visualization
+└── utils/                # Utilities
+```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit issues or pull requests.
+Contributions welcome! Please:
 
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open Pull Request
+2. Create feature branch
+3. Commit changes
+4. Push and open PR
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE)
+
+---
+
+## 🙏 Acknowledgments
+
+- [OpenAI GPT-4](https://openai.com)
+- [GitHub Actions](https://github.com/features/actions)
+- [@babel/parser](https://babeljs.io/docs/en/babel-parser)
+- [@typescript-eslint/parser](https://typescript-eslint.io)
 
 ---
 
 ## 📞 Support
 
-- 📫 Issues: [GitHub Issues](https://github.com/zxcnoname666/release-helper/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/zxcnoname666/release-helper/discussions)
-- ⭐ Star this repo if it helps you!
-
----
-
-## 🏷️ Keywords
-
-`github-actions` `github-action` `release-automation` `ai-changelog` `changelog-generator` `semantic-versioning` `semver` `openai` `gpt-5` `conventional-commits` `ci-cd` `devops` `automation` `typescript` `version-management` `release-notes` `ai-powered` `commit-parser` `discord-integration` `developer-tools`
+- 🐛 [Report Bug](https://github.com/zxcnoname666/Release-Helper/issues)
+- 💡 [Request Feature](https://github.com/zxcnoname666/Release-Helper/issues)
+- 📖 [Documentation](https://github.com/zxcnoname666/Release-Helper)
 
 ---
 
@@ -513,20 +355,6 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 **Made with ❤️ by [zxcnoname666](https://github.com/zxcnoname666)**
 
-⭐ Star this repo to support the project!
+⭐ Star this repo if you find it useful!
 
-[Report Bug](https://github.com/zxcnoname666/release-helper/issues) • [Request Feature](https://github.com/zxcnoname666/release-helper/issues) • [Documentation](https://github.com/zxcnoname666/release-helper#readme)
-
----
-
-<img src="https://count.getloli.com/get/@release-helper">
-
- <a href="https://github.com/zxcnoname666/Release-Helper">
-  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=zxcnoname666/Release-Helper&type=date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=zxcnoname666/Release-Helper&type=date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=zxcnoname666/Release-Helper&type=date" />
-  </picture>
- </a>
-</p>
 </div>
