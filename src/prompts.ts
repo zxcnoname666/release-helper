@@ -111,18 +111,11 @@ ${commitsByType}
 
 The commit information above is BASIC and MINIMAL. Before generating the changelog, you MUST:
 
-1. **Use tools to analyze key commits**: Call get_commit_diff and analyze_commit_impact for important changes
+1. **Use tools to analyze key commits**: Use get_commit_diff and analyze_commit_impact for important changes
 2. **Understand the actual code changes**: Don't just repeat commit messages, explain what actually changed
-3. **Wait for tool results**: After receiving tool results, generate the detailed changelog
+3. **Generate detailed changelog**: After receiving tool results, create the comprehensive changelog
 
-Example first response:
-\`\`\`json
-[
-  { "tool": "get_commit_diff", "arguments": { "sha": "abc123" } },
-  { "tool": "analyze_commit_impact", "arguments": { "sha": "abc123" } },
-  { "tool": "get_commit_diff", "arguments": { "sha": "def456" } }
-]
-\`\`\`
+You have access to tools - use them to gather detailed information about commits before generating the final changelog.
 
 ## Changelog Requirements
 
@@ -214,41 +207,3 @@ export function formatSimpleChangelog(
   return changelog;
 }
 
-/**
- * Parse tool requests from AI response
- */
-export function parseToolRequests(response: string): Array<{ tool: string; arguments: Record<string, any> }> {
-  const requests: Array<{ tool: string; arguments: Record<string, any> }> = [];
-
-  // Try to find JSON blocks (supports both single objects and arrays)
-  const jsonMatches = response.matchAll(/```json\s*([\s\S]*?)\s*```/g);
-
-  for (const match of jsonMatches) {
-    try {
-      const parsed = JSON.parse(match[1]);
-
-      // Handle array of tool requests
-      if (Array.isArray(parsed)) {
-        for (const item of parsed) {
-          if (item.tool) {
-            requests.push({
-              tool: item.tool,
-              arguments: item.arguments || {},
-            });
-          }
-        }
-      }
-      // Handle single tool request
-      else if (parsed.tool) {
-        requests.push({
-          tool: parsed.tool,
-          arguments: parsed.arguments || {},
-        });
-      }
-    } catch {
-      // Ignore invalid JSON
-    }
-  }
-
-  return requests;
-}
