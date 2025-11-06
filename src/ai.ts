@@ -4,8 +4,8 @@
 
 import { warning, info } from '@actions/core';
 import type { AIContext, CommitInfo, ParsedCommit } from './types.js';
-import { generateSystemPrompt, generateUserPrompt, parseToolRequests } from './prompts.js';
-import { executeTool } from './ai-tools.js';
+import { generateSystemPrompt, generateUserPrompt } from './prompts.js';
+import { executeTool, AI_TOOLS } from './ai-tools.js';
 
 /**
  * OpenAI API configuration
@@ -17,10 +17,49 @@ interface OpenAIConfig {
 }
 
 /**
+ * OpenAI message types
+ */
+interface OpenAIMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string | null;
+  tool_calls?: OpenAIToolCall[];
+  tool_call_id?: string;
+  name?: string;
+}
+
+interface OpenAIToolCall {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
+
+interface OpenAIResponse {
+  content: string | null;
+  tool_calls?: OpenAIToolCall[];
+}
+
+/**
  * Maximum iterations for tool use loop
  * Increased to handle repositories with many commits
  */
 const MAX_ITERATIONS = 15;
+
+/**
+ * Convert AI_TOOLS to OpenAI tools format
+ */
+function convertToolsToOpenAIFormat() {
+  return AI_TOOLS.map(tool => ({
+    type: 'function' as const,
+    function: {
+      name: tool.name,
+      description: tool.description,
+      parameters: tool.parameters,
+    },
+  }));
+}
 
 /**
  * Generate changelog using AI with tool support
@@ -32,11 +71,12 @@ export async function generateAIChangelog(
   const systemPrompt = generateSystemPrompt();
   const userPrompt = generateUserPrompt(context);
 
-  const messages = [
+  const messages: OpenAIMessage[] = [
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt },
   ];
 
+  const tools = convertToolsToOpenAIFormat();
   let iteration = 0;
   let finalResponse = '';
 
@@ -45,58 +85,68 @@ export async function generateAIChangelog(
     iteration++;
     info(`AI iteration ${iteration}/${MAX_ITERATIONS}`);
 
-    const response = await callOpenAI(messages, config);
-    info(`AI response length: ${response.length} chars`);
+    const response = await callOpenAI(messages, config, tools);
 
-    // Check if response is empty or too short
-    if (!response || response.trim().length === 0) {
-      warning(`AI returned empty response at iteration ${iteration}`);
-      if (iteration > 1) {
-        // If we already used tools, prompt for the final response
-        messages.push({
-          role: 'user',
-          content: 'Please provide the complete changelog now based on the tool results you received.',
-        });
-        continue;
-      } else {
-        throw new Error('AI returned empty response on first iteration');
+    // If AI wants to use tools
+    if (response.tool_calls && response.tool_calls.length > 0) {
+      info(`AI requested ${response.tool_calls.length} tool call(s): ${response.tool_calls.map(tc => tc.function.name).join(', ')}`);
+
+      // Add assistant message with tool calls
+      messages.push({
+        role: 'assistant',
+        content: response.content,
+        tool_calls: response.tool_calls,
+      });
+
+      // Execute each tool and add results
+      for (const toolCall of response.tool_calls) {
+        try {
+          const args = JSON.parse(toolCall.function.arguments);
+          const result = await executeTool(
+            toolCall.function.name,
+            args,
+            {
+              commits: context.commits.map(c => c.commit),
+              parsedCommits: context.commits,
+            }
+          );
+
+          messages.push({
+            role: 'tool',
+            tool_call_id: toolCall.id,
+            name: toolCall.function.name,
+            content: result,
+          });
+        } catch (error) {
+          messages.push({
+            role: 'tool',
+            tool_call_id: toolCall.id,
+            name: toolCall.function.name,
+            content: `Error: ${error}`,
+          });
+        }
       }
+
+      continue;
     }
 
-    const toolRequests = parseToolRequests(response);
-
-    // If no tool requests, we have the final response
-    if (toolRequests.length === 0) {
-      info('No tool requests found, treating as final response');
-      finalResponse = response.trim();
+    // No tool calls - this is the final response
+    if (response.content) {
+      info('AI provided final response');
+      finalResponse = response.content.trim();
       break;
     }
 
-    // Execute tools
-    info(`Found ${toolRequests.length} tool request(s): ${toolRequests.map(r => r.tool).join(', ')}`);
-    const toolResults: string[] = [];
-
-    for (const request of toolRequests) {
-      try {
-        const result = await executeTool(
-          request.tool,
-          request.arguments,
-          {
-            commits: context.commits.map(c => c.commit),
-            parsedCommits: context.commits,
-          }
-        );
-        toolResults.push(`**Tool**: ${request.tool}\n**Result**:\n${result}`);
-      } catch (error) {
-        toolResults.push(`**Tool**: ${request.tool}\n**Error**: ${error}`);
-      }
+    // Empty response
+    warning(`AI returned empty response at iteration ${iteration}`);
+    if (iteration > 1) {
+      messages.push({
+        role: 'user',
+        content: 'Please provide the complete changelog now based on the tool results you received.',
+      });
+    } else {
+      throw new Error('AI returned empty response on first iteration');
     }
-
-    // Add tool results to conversation
-    messages.push(
-      { role: 'assistant', content: response },
-      { role: 'user', content: `Tool results:\n\n${toolResults.join('\n\n---\n\n')}\n\nNow generate the complete changelog based on these results.` }
-    );
   }
 
   if (!finalResponse) {
@@ -123,12 +173,13 @@ export async function generateAIChangelog(
 }
 
 /**
- * Call OpenAI API
+ * Call OpenAI API with tools support
  */
 async function callOpenAI(
-  messages: Array<{ role: string; content: string }>,
-  config: OpenAIConfig
-): Promise<string> {
+  messages: OpenAIMessage[],
+  config: OpenAIConfig,
+  tools?: any[]
+): Promise<OpenAIResponse> {
   const url = config.baseUrl.endsWith('/chat/completions')
     ? config.baseUrl
     : `${config.baseUrl}/chat/completions`.replace(/\/+/g, '/');
@@ -137,18 +188,26 @@ async function callOpenAI(
     // Use globalThis.fetch to ensure compatibility with bundled code
     const fetchFn = globalThis.fetch || fetch;
 
+    const requestBody: any = {
+      model: config.model,
+      messages,
+      temperature: 0.7,
+      max_tokens: 2000,
+    };
+
+    // Add tools if provided
+    if (tools && tools.length > 0) {
+      requestBody.tools = tools;
+      requestBody.tool_choice = 'auto';
+    }
+
     const response = await fetchFn(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${config.apiKey}`,
       },
-      body: JSON.stringify({
-        model: config.model,
-        messages,
-        temperature: 0.7,
-        max_tokens: 2000,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -157,7 +216,12 @@ async function callOpenAI(
     }
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || '';
+    const message = data.choices?.[0]?.message;
+
+    return {
+      content: message?.content || null,
+      tool_calls: message?.tool_calls,
+    };
   } catch (error: any) {
     // Provide more detailed error information
     if (error.cause) {
@@ -173,29 +237,8 @@ async function callOpenAI(
 function cleanupResponse(response: string): string {
   let cleaned = response;
 
-  // Remove thinking blocks (but be careful not to remove everything)
+  // Remove thinking blocks
   cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/g, '');
-
-  // Remove tool request blocks - only if they contain "tool" field
-  // Match more precisely: ```json followed by array/object with "tool" field
-  const toolBlockRegex = /```json\s*(\[[\s\S]*?\]|\{[\s\S]*?\})\s*```/g;
-  cleaned = cleaned.replace(toolBlockRegex, (match, jsonContent) => {
-    try {
-      // Only remove if it's a valid tool request
-      const parsed = JSON.parse(jsonContent);
-      if (Array.isArray(parsed) && parsed.some(item => item.tool)) {
-        return ''; // Remove tool request arrays
-      }
-      if (parsed.tool) {
-        return ''; // Remove single tool request objects
-      }
-      // Keep other JSON blocks
-      return match;
-    } catch {
-      // If can't parse, keep the original
-      return match;
-    }
-  });
 
   // Remove multiple consecutive newlines
   cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
