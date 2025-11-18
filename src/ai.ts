@@ -68,7 +68,7 @@ export async function generateAIChangelog(
   context: AIContext,
   config: OpenAIConfig
 ): Promise<string> {
-  const systemPrompt = generateSystemPrompt();
+  const systemPrompt = generateSystemPrompt(context.language);
   const userPrompt = generateUserPrompt(context);
 
   const messages: OpenAIMessage[] = [
@@ -108,6 +108,7 @@ export async function generateAIChangelog(
             {
               commits: context.commits.map(c => c.commit),
               parsedCommits: context.commits,
+              versionInfo: context.versionInfo,
             }
           );
 

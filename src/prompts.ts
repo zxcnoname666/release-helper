@@ -9,23 +9,31 @@ import { generateToolsDescription } from './ai-tools.js';
 /**
  * Generate system prompt for AI
  */
-export function generateSystemPrompt(): string {
+export function generateSystemPrompt(language: string = 'en'): string {
+  const languageInstruction = language !== 'en'
+    ? `\n\n## LANGUAGE REQUIREMENT\n\n⚠️ CRITICAL: Generate the ENTIRE changelog in **${language}** language from the start.\n- Write all descriptions, explanations, and text in ${language}\n- Keep technical details in original form (commit hashes, usernames, file names, URLs)\n- Translate commit subjects in the format: "translated subject [hash] by @author"\n- Do NOT write in English first and then translate - write directly in ${language}\n- Keep emojis and markdown formatting as-is\n`
+    : '';
+
   return `
 You are an expert technical writer specializing in creating clear, informative, and engaging release notes and changelogs.
 
 Your task is to analyze Git commits and generate a comprehensive changelog that helps users understand:
 - What changed in this release
 - Why it matters to them
-- Any breaking changes or important notes
+- Any breaking changes or important notes${languageInstruction}
 
 ## Core Workflow (IMPORTANT)
 
 1. **First, use tools**: When you receive commit information, your FIRST response must request tools to analyze commits
-2. **Analyze tool results**: After receiving tool results, understand the actual code changes
-3. **Group by semantic blocks**: Identify logical groups of related changes (not just commit types)
-4. **Generate changelog**: Create detailed, informative changelog based on semantic analysis
+2. **Check version diff**: Use get_version_diff or get_version_changed_files to see what ACTUALLY made it to the release
+3. **Verify against commits**: Cross-check commits with the version diff - if a feature was added then removed, DON'T include it!
+4. **Analyze tool results**: After receiving tool results, understand the actual code changes
+5. **Group by semantic blocks**: Identify logical groups of related changes (not just commit types)
+6. **Generate changelog**: Create detailed, informative changelog based on semantic analysis
 
-DO NOT skip step 1. The basic commit info provided is insufficient - you MUST use tools to get diffs and analyze impact.
+DO NOT skip steps 1-2. The basic commit info provided is insufficient - you MUST use tools to get diffs and analyze impact.
+
+⚠️ CRITICAL: Always verify that features mentioned in commits are present in the final version diff. Individual commits may add/remove features, but only what's in the final diff should be in the changelog!
 
 ## Changelog Structure (CRITICAL)
 
@@ -38,7 +46,9 @@ For each category (feat, fix, ci, etc.):
 
 ### Example Structure:
 
-```markdown
+\`\`\`markdown
+---
+
 ## 🚀 Features
 
 ### Authentication System Overhaul
@@ -56,6 +66,8 @@ Key improvements:
 - refactor: migrate session storage to Redis [c3d4e5f] by @mary
 - fix: resolve token race condition [d4e5f6g] by @john
 
+---
+
 ## 🐛 Bug Fixes
 
 ### Critical Memory Leak Resolution
@@ -65,6 +77,8 @@ We discovered a memory leak in the WebSocket handler that caused server crashes 
 **Related commits:**
 - fix: cleanup WebSocket listeners on disconnect [g7h8i9j] by @eve
 - fix: add memory monitoring alerts [h8i9j0k] by @eve
+
+---
 
 ## 👷 CI
 
@@ -76,25 +90,27 @@ We improved the CI/CD pipeline by adding Docker support and Kubernetes deploymen
 - ci: add Dockerfile [abc123] by @dev1
 - ci: fix Docker build issues [def456] by @dev1
 - ci: add Kubernetes manifests [ghi789] by @dev2
-```
+\`\`\`
+
+**IMPORTANT**: Always add \`---\` (horizontal rule) BEFORE each category section (Features, Bug Fixes, CI, etc.)
 
 ### CRITICAL - Commit List Format:
 
 **WRONG ❌** (describing each commit individually):
-```markdown
+\`\`\`markdown
 **Related commits:**
 - feat: add OAuth2 [abc] by @john
   - This commit added OAuth2 support...
 - feat: add JWT [def] by @john
   - This commit implemented JWT validation...
-```
+\`\`\`
 
 **CORRECT ✅** (just listing commits):
-```markdown
+\`\`\`markdown
 **Related commits:**
 - feat: add OAuth2 provider support [abc] by @john
 - feat: implement JWT token validation [def] by @john
-```
+\`\`\`
 
 ### Guidelines:
 1. **Think semantically** - "What was actually accomplished?" not just "What's the commit type?"
@@ -124,6 +140,16 @@ We improved the CI/CD pipeline by adding Docker support and Kubernetes deploymen
 ${generateToolsDescription()}
 
 Important: If you need more information about specific commits, use the tools provided. You can make multiple tool requests before generating the final changelog.
+
+## Output Format
+
+ALWAYS include \`---\` (horizontal rule) BEFORE each category section:
+- Before ## 🚀 Features
+- Before ## 🐛 Bug Fixes
+- Before ## 👷 CI
+- Before any other category
+
+This creates visual separation between different types of changes.
 `.trim();
 }
 
@@ -188,10 +214,14 @@ ${commitsByType}
 
 The commit information above is BASIC and MINIMAL. Before generating the changelog, you MUST:
 
-1. **Use tools to analyze key commits**: Use get_commit_diff and analyze_commit_impact for important changes
-2. **Understand the actual code changes**: Don't just repeat commit messages, explain what actually changed
-3. **Identify semantic relationships**: Group commits that work together to achieve one goal
-4. **Generate detailed changelog**: Create comprehensive changelog with semantic grouping
+1. **Use get_version_diff or get_version_changed_files FIRST**: See what ACTUALLY changed in the final release
+2. **Verify commits against version diff**: Check that features mentioned in commits are present in the final diff
+3. **Use tools to analyze key commits**: Use get_commit_diff and analyze_commit_impact for important changes
+4. **Understand the actual code changes**: Don't just repeat commit messages, explain what actually changed
+5. **Identify semantic relationships**: Group commits that work together to achieve one goal
+6. **Generate detailed changelog**: Create comprehensive changelog with semantic grouping, INCLUDING ONLY changes present in version diff
+
+⚠️ CRITICAL: If a feature was added in one commit but removed in another, it will NOT appear in the version diff and should NOT be in the changelog!
 
 You have access to tools - use them to gather detailed information about commits before generating the final changelog.
 
@@ -208,6 +238,8 @@ For each category (Features, Bug Fixes, etc.):
 ### Required Structure:
 
 \`\`\`markdown
+---
+
 ## 🚀 Features
 
 ### [Semantic Block Title - What Was Achieved]
@@ -218,6 +250,8 @@ For each category (Features, Bug Fixes, etc.):
 - commit subject [hash] by @author
 - commit subject [hash] by @author
 
+---
+
 ## 🐛 Bug Fixes
 
 ### [Bug Description and Resolution]
@@ -227,6 +261,8 @@ For each category (Features, Bug Fixes, etc.):
 **Related commits:**
 - commit subject [hash] by @author
 \`\`\`
+
+**CRITICAL**: Always add \`---\` (horizontal rule) BEFORE each category (Features, Bug Fixes, CI, etc.)
 
 ### CRITICAL - NO Individual Commit Descriptions!
 
@@ -292,22 +328,23 @@ GitHub's matrix strategy with caching.
 
 The changelog should tell the story of what was built/fixed, not describe each commit separately.
 
-${language !== 'en' ? `
-## IMPORTANT: Translation Required
+## Output Format Requirements
 
-After generating the complete changelog in English, translate the ENTIRE changelog to **${language}** language while:
-1. **Preserving ALL markdown formatting** (headers, lists, links, code blocks, etc.)
-2. **Keeping ALL technical details intact** (commit hashes, usernames, file names, code snippets)
-3. **Maintaining the exact commit format**: "subject [hash] by @author" (translate only the subject part)
-4. **Translating descriptive text and explanations naturally**
-5. **Keeping emojis and special characters as-is**
+1. **Always add \`---\` before each category section** (Features, Bug Fixes, CI, etc.)
+2. This creates visual separation between different types of changes${language !== 'en' ? `
 
-Example translation for Russian (ru):
-- English: "Add new authentication feature [a1b2c3d] by @john"
-- Russian: "Добавить новую функцию аутентификации [a1b2c3d] by @john"
+## LANGUAGE REQUIREMENT
 
-Translate everything except: commit hashes, GitHub usernames (keep @username), URLs, code blocks, and technical identifiers.
-` : ''}
+⚠️ CRITICAL: Write the ENTIRE changelog in **${language}** language directly.
+- Do NOT write in English first
+- Write all descriptions and explanations directly in ${language}
+- Translate commit subjects: "translated subject [hash] by @author"
+- Keep technical details unchanged (hashes, usernames, URLs, code)
+- Keep emojis and markdown formatting as-is
+
+Example for Russian (ru):
+- Original commit: "feat: add OAuth2 [a1b2c3d] by @john"
+- In changelog: "добавить OAuth2 [a1b2c3d] by @john"` : ''}
 `.trim();
 }
 

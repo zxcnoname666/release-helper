@@ -163,3 +163,55 @@ export async function getCommitDate(ref: string): Promise<Date> {
   const timestamp = await execGit(['log', '-1', '--format=%aI', ref]);
   return new Date(timestamp);
 }
+
+/**
+ * Get overall diff between two versions (what actually changed in the final result)
+ * This shows the net changes, ignoring intermediate commits
+ */
+export async function getVersionDiff(from: string | null, to: string, maxLines?: number): Promise<string> {
+  const range = from ? `${from}..${to}` : `${to}^..${to}`;
+  const output = await execGit(['diff', range]);
+
+  if (maxLines) {
+    const lines = output.split('\n');
+    if (lines.length > maxLines) {
+      return lines.slice(0, maxLines).join('\n') + `\n... (truncated, ${lines.length - maxLines} more lines)`;
+    }
+  }
+
+  return output;
+}
+
+/**
+ * Get list of files that actually changed between versions (net result)
+ */
+export async function getVersionChangedFiles(from: string | null, to: string): Promise<{
+  added: string[];
+  modified: string[];
+  deleted: string[];
+  all: string[];
+}> {
+  const range = from ? `${from}..${to}` : `${to}^..${to}`;
+  const output = await execGit(['diff', '--name-status', range]);
+
+  const added: string[] = [];
+  const modified: string[] = [];
+  const deleted: string[] = [];
+
+  for (const line of output.split('\n').filter(Boolean)) {
+    const match = line.match(/^([AMD])\s+(.+)$/);
+    if (match) {
+      const [, status, file] = match;
+      if (status === 'A') added.push(file);
+      else if (status === 'M') modified.push(file);
+      else if (status === 'D') deleted.push(file);
+    }
+  }
+
+  return {
+    added,
+    modified,
+    deleted,
+    all: [...added, ...modified, ...deleted],
+  };
+}

@@ -2,8 +2,8 @@
  * AI Tools system - provides structured tools for AI to gather context
  */
 
-import type { AITool, CommitInfo, ParsedCommit } from './types.js';
-import { getCommitDiff, getChangedFiles, getCommitStats } from './git.js';
+import type { AITool, CommitInfo, ParsedCommit, VersionInfo } from './types.js';
+import { getCommitDiff, getChangedFiles, getCommitStats, getVersionDiff, getVersionChangedFiles } from './git.js';
 import { parseCommitMessage, formatCommit } from './commits.js';
 
 /**
@@ -90,6 +90,29 @@ export const AI_TOOLS: AITool[] = [
       required: ['sha'],
     },
   },
+  {
+    name: 'get_version_diff',
+    description: 'Get the overall diff between two versions (what actually changed in the final result). This shows the NET changes after all commits, ignoring intermediate additions/removals. Use this to verify if features mentioned in commits actually made it to the final release.',
+    parameters: {
+      type: 'object',
+      properties: {
+        max_lines: {
+          type: 'string',
+          description: 'Maximum number of lines to return (default: 300)',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'get_version_changed_files',
+    description: 'Get the list of files that actually changed between versions (net result). Shows which files were added, modified, or deleted in the final release. Use this to verify if files mentioned in commits are actually present in the release.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
 ];
 
 /**
@@ -98,6 +121,7 @@ export const AI_TOOLS: AITool[] = [
 interface ToolContext {
   commits: CommitInfo[];
   parsedCommits: ParsedCommit[];
+  versionInfo: VersionInfo;
 }
 
 /**
@@ -123,6 +147,12 @@ export async function executeTool(
 
     case 'analyze_commit_impact':
       return await analyzeCommitImpact(args.sha, context);
+
+    case 'get_version_diff':
+      return await getVersionDiffTool(args.max_lines, context);
+
+    case 'get_version_changed_files':
+      return await getVersionChangedFilesTool(context);
 
     default:
       return `Unknown tool: ${toolName}`;
@@ -306,6 +336,87 @@ function findCommit(sha: string, commits: CommitInfo[]): CommitInfo | undefined 
 }
 
 /**
+ * Tool: Get overall version diff
+ */
+async function getVersionDiffTool(
+  maxLines: string | undefined,
+  context: ToolContext
+): Promise<string> {
+  const limit = maxLines ? parseInt(maxLines, 10) : MAX_DIFF_LINES;
+  const { previous, current } = context.versionInfo;
+
+  const diff = await getVersionDiff(previous || null, current, limit);
+
+  if (!diff) {
+    return `
+📝 **Version Diff: ${previous || 'initial'}...${current}**
+
+No changes detected between versions.
+`.trim();
+  }
+
+  return `
+📝 **Overall Version Diff: ${previous || 'initial'}...${current}**
+
+This shows the NET changes between versions, ignoring intermediate commits.
+Use this to verify which features/changes actually made it to the final release.
+
+\`\`\`diff
+${diff}
+\`\`\`
+
+${diff.includes('truncated') ? '⚠️ Diff was truncated to fit token limits. Use get_version_changed_files to see all affected files.' : ''}
+`.trim();
+}
+
+/**
+ * Tool: Get version changed files
+ */
+async function getVersionChangedFilesTool(context: ToolContext): Promise<string> {
+  const { previous, current } = context.versionInfo;
+
+  const files = await getVersionChangedFiles(previous || null, current);
+
+  if (files.all.length === 0) {
+    return `
+📁 **Version Changed Files: ${previous || 'initial'}...${current}**
+
+No files changed between versions.
+`.trim();
+  }
+
+  let output = `📁 **Version Changed Files: ${previous || 'initial'}...${current}** (${files.all.length} total)\n\n`;
+  output += `This shows which files ACTUALLY changed in the final release.\n`;
+  output += `Use this to verify if features mentioned in commits are present in the release.\n\n`;
+
+  if (files.added.length > 0) {
+    output += `**Added (${files.added.length}):**\n`;
+    for (const file of files.added) {
+      output += `  + ${file}\n`;
+    }
+    output += '\n';
+  }
+
+  if (files.modified.length > 0) {
+    output += `**Modified (${files.modified.length}):**\n`;
+    for (const file of files.modified) {
+      output += `  ~ ${file}\n`;
+    }
+    output += '\n';
+  }
+
+  if (files.deleted.length > 0) {
+    output += `**Deleted (${files.deleted.length}):**\n`;
+    for (const file of files.deleted) {
+      output += `  - ${file}\n`;
+    }
+    output += '\n';
+  }
+
+  return output.trim();
+}
+
+/**
  * Generate tools description for AI prompt
  */
 export function generateToolsDescription(): string {
@@ -322,9 +433,13 @@ ${i + 1}. **${tool.name}**
 ## Required Workflow
 
 1. **First Response**: Use tools to gather details about key commits (get_commit_diff, analyze_commit_impact)
-2. **Analyze Tool Results**: Understand the actual code changes from the tool responses
-3. **Generate Changelog**: Create detailed, informative changelog based on tool analysis
+2. **IMPORTANT**: Use get_version_diff or get_version_changed_files to see what ACTUALLY changed in the final release
+3. **Verify**: Check that features mentioned in commits are present in the final diff
+4. **Analyze Tool Results**: Understand the actual code changes from the tool responses
+5. **Generate Changelog**: Create detailed, informative changelog based on tool analysis
 
 DO NOT skip the tool usage step. The basic commit info provided is minimal - you MUST use tools to get diffs and analyze impact before generating the changelog.
+
+CRITICAL: Always verify commits against the version diff. If a feature was added and then removed, it should NOT be in the changelog!
 `.trim();
 }
