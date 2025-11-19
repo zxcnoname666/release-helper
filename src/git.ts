@@ -22,6 +22,24 @@ async function execGit(args: string[]): Promise<string> {
 }
 
 /**
+ * Get latest semantic version tag from git (fallback for getLatestReleaseTag)
+ */
+export async function getLatestVersionTag(): Promise<string | undefined> {
+  try {
+    // Get all tags sorted by version
+    const output = await execGit(['tag', '--sort=-version:refname', '--list', 'v*.*.*']);
+    if (!output) {
+      return undefined;
+    }
+
+    const tags = output.split('\n').filter(Boolean);
+    return tags[0]; // First tag is the latest version
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Check if working directory is clean
  */
 export async function assertCleanWorkingDir(): Promise<void> {

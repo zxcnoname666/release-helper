@@ -3,10 +3,11 @@
  */
 
 import { getOctokit } from '@actions/github';
-import { info } from '@actions/core';
+import { info, warning } from '@actions/core';
 import type { CommitInfo } from './types.js';
 import { readFileSync } from 'fs';
 import { lookup } from 'mime-types';
+import { getLatestVersionTag } from './git.js';
 
 type Octokit = ReturnType<typeof getOctokit>;
 
@@ -23,7 +24,14 @@ export async function getLatestReleaseTag(
     return release.data.tag_name;
   } catch (error: any) {
     if (error.status === 404) {
-      return undefined; // No releases yet
+      // No "latest" release found, try to get latest tag from git
+      warning('No latest release found via GitHub API, trying to get latest tag from git...');
+      const gitTag = await getLatestVersionTag();
+      if (gitTag) {
+        info(`Found latest tag from git: ${gitTag}`);
+        return gitTag;
+      }
+      return undefined; // No releases or tags yet
     }
     throw error;
   }
