@@ -168,17 +168,22 @@ export async function generateAIChangelog(
     // Add a strict message demanding actual changelog
     messages.push({
       role: 'user',
-      content: `CRITICAL: Your previous response was rejected because it contained refusals or explanations instead of an actual changelog.
+      content: `CRITICAL: Your previous response was INCOMPLETE or contained refusals.
 
-You MUST provide a complete, properly formatted changelog NOW. Do NOT explain why you can't do it.
+Generate a COMPLETE changelog NOW with ALL sections fully filled out:
 
-Requirements:
-1. Start directly with changelog sections (Features, Bug Fixes, etc.)
-2. Group commits by semantic meaning
-3. Include commit hashes and authors
-4. NO refusals, NO excuses, NO explanations of inability
+1. For EACH category (Features, Fixes, etc.), create semantic blocks with:
+   - A descriptive title for what was accomplished
+   - 2-4 sentences explaining what was done and why
+   - List of all related commits with [hash] by @author
 
-Generate the changelog immediately based on the tool results you received.`,
+2. Make sure to COMPLETE every section you start - no cutting off mid-description
+
+3. Include proper markdown formatting with --- separators
+
+4. NO refusals or excuses - just generate the complete changelog
+
+Based on all the tool results and commits you've seen, generate the FULL, COMPLETE changelog now.`,
     });
 
     // Retry once
@@ -239,7 +244,7 @@ async function callOpenAI(
       model: config.model,
       messages,
       temperature: 0.7,
-      max_tokens: 2000,
+      max_tokens: 4000,
     };
 
     // Add tools if provided
@@ -286,28 +291,28 @@ async function validateResponse(
   config: OpenAIConfig
 ): Promise<{ isValid: boolean; reason?: string }> {
   const validationPrompt = `
-Analyze the following text and determine if it's a valid changelog or if it contains refusal statements.
+Analyze the following text and determine if it's a valid, COMPLETE changelog.
 
 TEXT TO ANALYZE:
 """
-${response.substring(0, 1000)}
+${response.substring(0, 2000)}
 """
 
-A response is INVALID if it contains phrases like:
-- "I cannot create/generate/provide..."
-- "I'm unable to..."
-- "I don't have enough information..."
-- "I need more information..."
-- Any explanation of why changelog cannot be created
+A response is INVALID if:
+- Contains refusal phrases like "I cannot...", "I'm unable...", "I don't have enough information..."
+- Is incomplete (starts describing features but cuts off abruptly)
+- Only contains headers without actual content
+- Missing descriptions for sections that were started
 
-A response is VALID if it:
-- Contains actual changelog content with sections like "Features", "Bug Fixes", etc.
-- Lists commits and changes
-- Describes what was done in the release
+A response is VALID if:
+- Contains complete sections (Features, Bug Fixes, etc.) with full descriptions
+- Each section that is started is also completed
+- Lists commits with proper formatting
+- Describes what was done in detail
 
 Respond with ONLY ONE WORD:
-- "VALID" if the text is a proper changelog
-- "INVALID" if the text contains refusals or excuses
+- "VALID" if the text is a complete, proper changelog
+- "INVALID" if incomplete, contains refusals, or cuts off mid-section
 
 Your response:`.trim();
 

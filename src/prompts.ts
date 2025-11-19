@@ -24,39 +24,19 @@ Your task is to analyze Git commits and generate a comprehensive changelog that 
 
 ## ⚠️ CRITICAL: NO REFUSALS ALLOWED
 
-You MUST ALWAYS generate a changelog. NEVER respond with:
-- "I cannot create a summary..."
-- "I'm unable to generate..."
-- "I don't have enough information..."
-- "I cannot provide..."
-- Any other form of refusal or inability statement
+You MUST ALWAYS generate a complete, detailed changelog. NEVER respond with refusals like:
+- "I cannot create a summary..." / "I'm unable to generate..." / "I don't have enough information..."
 
-If information seems insufficient, use the available tools to gather more data.
-If tools don't provide enough context, generate changelog based on commit messages.
-You ALWAYS have enough information to create at least a basic changelog.
+**Your response MUST be a complete changelog with all sections filled out, not an explanation of inability.**${languageInstruction}
 
-**Your response MUST be a valid changelog, not an explanation of why you can't create one.**${languageInstruction}
+## Core Workflow
 
-## Core Workflow (IMPORTANT)
-
-1. **First, analyze ALL commits**: Use get_version_diff or get_version_changed_files FIRST to understand the full scope
-2. **Use tools extensively**: Don't stop after 1-2 tool calls - analyze ALL significant commits
-3. **Get detailed diffs**: Use get_commit_diff for ALL major commits (feat, fix, etc.) - don't skip any
-4. **Verify against version diff**: Cross-check commits with the version diff - if a feature was added then removed, DON'T include it!
-5. **Analyze tool results**: After receiving ALL tool results, understand the complete picture
-6. **Group by semantic blocks**: Identify logical groups of related changes (not just commit types)
-7. **Generate changelog**: Create detailed, informative changelog based on COMPLETE semantic analysis
-
-⚠️ CRITICAL RULES:
-- DO NOT stop tool usage after 1-2 calls - analyze ALL major commits
-- Use get_commit_diff for EVERY commit type (feat, fix, ci, refactor, etc.)
-- Always use get_version_diff to see the final result
-- If there are 10 commits, make 10+ tool calls to analyze them all
-- The basic commit info provided is minimal - you MUST gather FULL context via tools
-- Only after analyzing ALL commits should you generate the changelog
-- Always verify that features mentioned in commits are present in the final version diff
-
-**You have access to powerful tools - USE THEM ALL to gather complete information!**
+1. **Get the big picture**: Use get_version_diff to see what actually changed between versions
+2. **Analyze key commits**: Use get_commit_diff for important features/fixes to understand what was done
+3. **Group semantically**: Organize related commits into logical blocks (not just by type)
+4. **Write detailed descriptions**: For each semantic block, explain what was achieved and why it matters
+5. **List related commits**: Under each block, list all relevant commits with hashes and authors
+6. **Generate complete changelog**: Fill out ALL sections with detailed content
 
 ## Changelog Structure (CRITICAL)
 
@@ -233,25 +213,18 @@ ${commitsByType}
 
 **Task**: Generate a professional, user-friendly changelog for this release.
 
-## IMPORTANT: Tool Usage Required
+## IMPORTANT: How to Create the Changelog
 
-The commit information above is BASIC and MINIMAL. Before generating the changelog, you MUST:
+The commit information above is BASIC. To create a great changelog:
 
-1. **Use get_version_diff or get_version_changed_files FIRST**: See what ACTUALLY changed in the final release
-2. **Analyze EVERY significant commit**: Use get_commit_diff for ALL feat, fix, ci, refactor commits - don't skip any!
-3. **Get impact analysis**: Use analyze_commit_impact for major changes
-4. **Verify commits against version diff**: Check that features mentioned in commits are present in the final diff
-5. **Understand the actual code changes**: Don't just repeat commit messages, explain what actually changed
-6. **Identify semantic relationships**: Group commits that work together to achieve one goal
-7. **Generate detailed changelog**: Create comprehensive changelog with semantic grouping, INCLUDING ONLY changes present in version diff
+1. **Start with get_version_diff**: Understand what actually changed between versions overall
+2. **Analyze key commits**: Use get_commit_diff for the most important features, fixes, and changes
+3. **Group by purpose**: Organize commits into semantic blocks based on what they accomplish together
+4. **Write rich descriptions**: For each block, explain what was done, why, and any important details
+5. **Include all commits**: List relevant commits under each block with [hash] by @author format
 
-⚠️ CRITICAL REQUIREMENTS:
-- Make AT LEAST one tool call per commit (if there are 10 commits, make 10+ tool calls)
-- DO NOT generate changelog after just 1-2 tool calls - that's insufficient!
-- Use tools extensively to understand EVERY change in detail
-- If a feature was added in one commit but removed in another, it will NOT appear in the version diff and should NOT be in the changelog!
-
-**MANDATORY: You MUST use tools to analyze ALL commits. Insufficient tool usage = incomplete analysis = bad changelog!**
+**Important**: Use the tools to understand changes deeply - don't just paraphrase commit messages.
+The changelog should be informative and tell the story of what was built/fixed in this release.
 
 ## Changelog Format (CRITICAL)
 
