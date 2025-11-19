@@ -91,7 +91,7 @@ async function run(): Promise<void> {
 
     // ====== 6. Calculate statistics ======
     info('Calculating release statistics...');
-    const rangeStats = await getRangeStats(lastTag, sha);
+    const rangeStats = await getRangeStats(lastTag || null, sha);
     const contributors = getContributors(commits);
 
     let daysSinceLastRelease: number | null = null;

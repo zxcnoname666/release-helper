@@ -3,7 +3,7 @@
  */
 
 import { warning, info } from '@actions/core';
-import type { AIContext, CommitInfo, ParsedCommit } from './types.js';
+import type { AIContext } from './types.js';
 import { generateSystemPrompt, generateUserPrompt } from './prompts.js';
 import { executeTool, AI_TOOLS } from './ai-tools.js';
 
@@ -157,6 +157,52 @@ export async function generateAIChangelog(
   // Log before cleanup for debugging
   info(`Final response length before cleanup: ${finalResponse.length} chars`);
 
+  // Validate response quality
+  info('Validating AI response quality...');
+  const validation = await validateResponse(finalResponse, config);
+
+  if (!validation.isValid) {
+    warning(`AI response failed validation: ${validation.reason}`);
+    warning('Retrying with stricter instructions...');
+
+    // Add a strict message demanding actual changelog
+    messages.push({
+      role: 'user',
+      content: `CRITICAL: Your previous response was rejected because it contained refusals or explanations instead of an actual changelog.
+
+You MUST provide a complete, properly formatted changelog NOW. Do NOT explain why you can't do it.
+
+Requirements:
+1. Start directly with changelog sections (Features, Bug Fixes, etc.)
+2. Group commits by semantic meaning
+3. Include commit hashes and authors
+4. NO refusals, NO excuses, NO explanations of inability
+
+Generate the changelog immediately based on the tool results you received.`,
+    });
+
+    // Retry once
+    const retryResponse = await callOpenAI(messages, config);
+
+    if (retryResponse.content) {
+      info('Retry successful, validating retry response...');
+      const retryValidation = await validateResponse(retryResponse.content, config);
+
+      if (!retryValidation.isValid) {
+        warning('Retry response also failed validation, using fallback');
+        // If retry also fails, at least try to use what we have
+      } else {
+        info('Retry response validated successfully');
+      }
+
+      finalResponse = retryResponse.content.trim();
+    } else {
+      warning('Retry produced empty response, using original');
+    }
+  } else {
+    info('AI response validated successfully');
+  }
+
   // Clean up the response
   const cleaned = cleanupResponse(finalResponse);
 
@@ -216,7 +262,7 @@ async function callOpenAI(
       throw new Error(`OpenAI API error: ${response.status} - ${error}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     const message = data.choices?.[0]?.message;
 
     return {
@@ -229,6 +275,83 @@ async function callOpenAI(
       throw new Error(`Network error calling OpenAI API: ${error.message} (${error.cause})`);
     }
     throw new Error(`Failed to call OpenAI API: ${error.message}`);
+  }
+}
+
+/**
+ * Validate AI response to ensure it doesn't contain refusals
+ */
+async function validateResponse(
+  response: string,
+  config: OpenAIConfig
+): Promise<{ isValid: boolean; reason?: string }> {
+  const validationPrompt = `
+Analyze the following text and determine if it's a valid changelog or if it contains refusal statements.
+
+TEXT TO ANALYZE:
+"""
+${response.substring(0, 1000)}
+"""
+
+A response is INVALID if it contains phrases like:
+- "I cannot create/generate/provide..."
+- "I'm unable to..."
+- "I don't have enough information..."
+- "I need more information..."
+- Any explanation of why changelog cannot be created
+
+A response is VALID if it:
+- Contains actual changelog content with sections like "Features", "Bug Fixes", etc.
+- Lists commits and changes
+- Describes what was done in the release
+
+Respond with ONLY ONE WORD:
+- "VALID" if the text is a proper changelog
+- "INVALID" if the text contains refusals or excuses
+
+Your response:`.trim();
+
+  try {
+    const fetchFn = globalThis.fetch || fetch;
+    const url = config.baseUrl.endsWith('/chat/completions')
+      ? config.baseUrl
+      : `${config.baseUrl}/chat/completions`.replace(/\/+/g, '/');
+
+    const response_validation = await fetchFn(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages: [
+          { role: 'user', content: validationPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 100,
+      }),
+    });
+
+    if (!response_validation.ok) {
+      warning('Validation request failed, assuming response is valid');
+      return { isValid: true };
+    }
+
+    const data = await response_validation.json() as any;
+    const result = data.choices?.[0]?.message?.content?.trim().toUpperCase() || '';
+
+    if (result.includes('INVALID')) {
+      return {
+        isValid: false,
+        reason: 'Response contains refusal or inability statements'
+      };
+    }
+
+    return { isValid: true };
+  } catch (error) {
+    warning(`Validation failed: ${error}, assuming response is valid`);
+    return { isValid: true };
   }
 }
 
